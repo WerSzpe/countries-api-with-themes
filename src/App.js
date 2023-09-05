@@ -1,23 +1,59 @@
-import logo from './logo.svg';
+import { useEffect, useState } from 'react';
+
 import './App.css';
 
+import Navbar from './Navbar';
+import SearchBox from './SearchBox';
+import FilerBox from './FilerBox';
+import CountryCard from './CountryCard';
+
+
 function App() {
+
+  const [countryList, setCountryList] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const url = "https://restcountries.com/v3.1/all";
+
+    const fetchCountryList = async () => {
+
+      try{
+        const res = await fetch(url);
+        const data = await res.json();
+        setCountryList(data);
+        console.log(data)
+      } catch (e){
+        setError(e);
+      }
+      
+    };
+
+    fetchCountryList();
+
+  }, [])
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Navbar />
+      <SearchBox />
+      <FilerBox />
+
+      {countryList != null ? (
+      countryList.map((country, index) => {
+        return (
+          <div key={index+"d"}>
+            <CountryCard flag = {country.flag} 
+                          name={country.name.common}
+                          population={country.population}
+                          region={country.region}
+                          capital={country.capital} />
+          </div>
+        )
+      })) : 
+       {error}
+      }
+
     </div>
   );
 }
